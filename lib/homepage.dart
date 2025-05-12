@@ -1,5 +1,9 @@
 import 'package:flutter/material.dart';
-
+import 'settings.dart'; // Import the settings.dart page
+import 'website.dart';
+import 'feedback.dart';
+import 'lost_and_found.dart';
+import 'placement_stats.dart';
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -18,9 +22,25 @@ class _HomePageState extends State<HomePage> {
   ];
 
   void _onMenuOptionSelected(BuildContext context, String option) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text("$option Selected")),
-    );
+    if (option == "Settings") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const AppSettingsScreen(),
+        ),
+      );
+    }else if (option == "Campus Website") {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const WebsiteScreen(),
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("$option Selected")),
+      );
+    }
   }
 
   @override
@@ -158,9 +178,10 @@ class HomeScreen extends StatelessWidget {
             mainAxisSpacing: 20.0,
             children: [
               _buildMenuItem(context, Icons.menu_book, "Study Resources"),
-              _buildMenuItem(context, Icons.show_chart, "Placement Stats"),
+              _buildMenuItem(context, Icons.show_chart, "Placement Stats",PlacementStatsPage()),
               _buildMenuItem(context, Icons.event, "Clubs and Events"),
-              _buildMenuItem(context, Icons.help_outline, "Lost And Found"),
+              _buildMenuItem(
+                  context, Icons.help_outline, "Lost And Found", LostAndFoundPage()),
               _buildMenuItem(context, Icons.person_add, "Attendance Tracker"),
             ],
           ),
@@ -169,12 +190,20 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(BuildContext context, IconData icon, String label) {
+  Widget _buildMenuItem(BuildContext context, IconData icon, String label,
+      [Widget? destination]) {
     return GestureDetector(
       onTap: () {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("$label Selected")),
-        );
+        if (destination != null) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => destination),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text("$label Selected")),
+          );
+        }
       },
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -190,12 +219,13 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-
 class AnnouncementsScreen extends StatelessWidget {
   const AnnouncementsScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final ScrollController scrollController = ScrollController();
+
     return Column(
       children: [
         Container(
@@ -213,24 +243,71 @@ class AnnouncementsScreen extends StatelessWidget {
           ),
         ),
         Expanded(
-          child: ListView(
-            padding: const EdgeInsets.all(20.0),
-            children: [
-              _buildAnnouncementCard(
-                title: "UTSAV 2025 🎉",
-                description: "UNLEASH THE VIBE, IGNITE THE NIGHT – UTSAV IS HERE!",
-              ),
-              const SizedBox(height: 15),
-              _buildAnnouncementCard(
-                title: "UG 2025 G.DAY 🎓",
-                description: "BMSCE UG - 2025 BATCH GRADUATION DAY (20/5/2025)",
-              ),
-              const SizedBox(height: 15),
-              _buildAnnouncementCard(
-                title: "EVEN SEM CIE III",
-                description: "BMSCE UG - IV, VI, VIII SEMESTER TIMETABLE FOR CIE III",
-              ),
-            ],
+          child: Scrollbar(
+            controller: scrollController,
+            thumbVisibility: true,
+            thickness: 6,
+            radius: const Radius.circular(10),
+            child: ListView(
+              controller: scrollController,
+              padding: const EdgeInsets.all(20.0),
+              children: [
+                _buildAnnouncementCard(
+                  title: "UTSAV 2025 🎉",
+                  description: "UNLEASH THE VIBE, IGNITE THE NIGHT – UTSAV IS HERE!",
+                ),
+                const SizedBox(height: 15),
+                _buildAnnouncementCard(
+                  title: "UG 2025 Graduation Day 🎓",
+                  description: "BMSCE UG - 2025 BATCH GRADUATION DAY (20/5/2025)",
+                ),
+                const SizedBox(height: 15),
+                _buildAnnouncementCard(
+                  title: "EVEN SEM CIE III",
+                  description: "BMSCE UG - IV, VI, VIII SEMESTER TIMETABLE FOR CIE III",
+                ),
+                const SizedBox(height: 15),
+                _buildAnnouncementCard(
+                  title: "Hackathon 2025 🚀",
+                  description: "Join the annual hackathon and showcase your skills!",
+                ),
+                const SizedBox(height: 15),
+                _buildAnnouncementCard(
+                  title: "Alumni Meet 2025 🎓",
+                  description: "Reconnect with your batchmates on Alumni Meet Day.",
+                ),
+                const SizedBox(height: 15),
+                _buildAnnouncementCard(
+                  title: "Library Week 📚",
+                  description: "Enjoy exclusive events and workshops at the library.",
+                ),
+                const SizedBox(height: 15),
+                _buildAnnouncementCard(
+                  title: "Sports Fest 2025 🏆",
+                  description: "Gear up for this year's Sports Fest and win medals!",
+                ),
+                const SizedBox(height: 15),
+                _buildAnnouncementCard(
+                  title: "Tech Seminar 🎙️",
+                  description: "Attend the seminar on AI and Machine Learning trends.",
+                ),
+                const SizedBox(height: 15),
+                _buildAnnouncementCard(
+                  title: "Cultural Fest 🎭",
+                  description: "Show your artistic skills in the annual Cultural Fest.",
+                ),
+                const SizedBox(height: 15),
+                _buildAnnouncementCard(
+                  title: "Placement Drive 2025 💼",
+                  description: "Top companies are visiting – get ready for placements!",
+                ),
+                const SizedBox(height: 15),
+                _buildAnnouncementCard(
+                  title: "Blood Donation Camp ❤️",
+                  description: "Participate in the camp and save lives.",
+                ),
+              ],
+            ),
           ),
         ),
       ],
@@ -298,17 +375,8 @@ class ProfileScreen extends StatelessWidget {
         const SizedBox(height: 40),
         const CircleAvatar(
           radius: 50,
-          backgroundImage: AssetImage('images/bms_logo.jpg'), // Replace with your logo path
+          backgroundImage: AssetImage('images/bms_logo.jpg'),
         ),
-        const SizedBox(height: 10),
-        // const Text(
-        //   "BMS Hub",
-        //   style: TextStyle(
-        //     color: Colors.white,
-        //     fontSize: 18,
-        //     fontWeight: FontWeight.w400,
-        //   ),
-        // ),
         const SizedBox(height: 20),
         const Text(
           "BMSCE",
@@ -336,24 +404,49 @@ class ProfileScreen extends StatelessWidget {
         const Text(
           "shashanku.cs23@bmsce.ac.in",
           style: TextStyle(
-            color: Colors.white70,
-            fontSize: 14,
-          ),
+              color: Colors.white70,
+              fontSize: 14),
         ),
         const SizedBox(height: 30),
         Expanded(
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             children: [
-              _buildActionButton(Icons.edit, "Edit Profile"),
+              _buildActionButton(Icons.edit, "Edit Profile", () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Edit Profile Selected")),
+                );
+              }),
               const SizedBox(height: 25),
-              _buildActionButton(Icons.settings, "App Settings"),
+              _buildActionButton(Icons.settings, "App Settings", () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AppSettingsScreen(),
+                  ),
+                );
+              }),
               const SizedBox(height: 25),
-              _buildActionButton(Icons.download, "Downloaded files"),
+              _buildActionButton(Icons.download, "Downloaded files", () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("Downloaded Files Selected")),
+                );
+              }),
               const SizedBox(height: 25),
-              _buildActionButton(Icons.feedback, "Give us feedback"),
+              _buildActionButton(Icons.feedback, "Give us feedback", () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const FeedbackScreen(),
+                  ),
+                );
+              }),
               const SizedBox(height: 25),
-              _buildActionButton(Icons.info, "App info"),
+              _buildActionButton(Icons.info, "App info", () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("App Info Selected")),
+                );
+              }),
             ],
           ),
         ),
@@ -361,11 +454,11 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButton(IconData icon, String label) {
+  Widget _buildActionButton(IconData icon, String label, VoidCallback onPressed) {
     return SizedBox(
       width: double.infinity,
       child: ElevatedButton(
-        onPressed: () {},
+        onPressed: onPressed,
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.blue,
           shape: RoundedRectangleBorder(
@@ -388,7 +481,6 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 }
-
 class PlaceholderWidget extends StatelessWidget {
   final String text;
   const PlaceholderWidget(this.text, {super.key});

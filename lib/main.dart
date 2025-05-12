@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'settings.dart'; // Import settings screen
 import 'welcome.dart'; // Import the WelcomePage
 import 'register.dart'; // Import the RegisterPage
 import 'login.dart'; // Import the LoginPage
@@ -9,18 +10,30 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  // Initialize the global theme notifier
+  static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
+
   const MyApp({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      initialRoute: '/', // Define the initial route
-      routes: {
-        '/': (context) => SplashScreen(logoAssetPath: 'images/logo.png'), // SplashScreen is now the initial route
-        '/welcome': (context) => const WelcomePage(), // Add WelcomePage route
-        '/register': (context) => const RegisterPage(), // Add RegisterPage route
-        '/login': (context) => const LoginPage(), // Add LoginPage route
+    return ValueListenableBuilder<ThemeMode>(
+      valueListenable: themeNotifier,
+      builder: (context, currentTheme, _) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: ThemeData.light(),
+          darkTheme: ThemeData.dark(),
+          themeMode: currentTheme,
+          initialRoute: '/', // Define the initial route
+          routes: {
+            '/': (context) => SplashScreen(logoAssetPath: 'images/logo.png'), // SplashScreen is now the initial route
+            '/welcome': (context) => const WelcomePage(), // Add WelcomePage route
+            '/register': (context) => const RegisterPage(), // Add RegisterPage route
+            '/login': (context) => const LoginPage(), // Add LoginPage route
+            '/settings': (context) => const AppSettingsScreen(), // Add AppSettingsScreen route
+          },
+        );
       },
     );
   }

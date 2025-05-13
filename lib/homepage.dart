@@ -4,6 +4,8 @@ import 'website.dart';
 import 'feedback.dart';
 import 'lost_and_found.dart';
 import 'placement_stats.dart';
+import 'attendance.dart';
+import 'resources.dart';
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -177,12 +179,12 @@ class HomeScreen extends StatelessWidget {
             crossAxisSpacing: 20.0,
             mainAxisSpacing: 20.0,
             children: [
-              _buildMenuItem(context, Icons.menu_book, "Study Resources"),
+              _buildMenuItem(context, Icons.menu_book, "Study Resources",StudyResourcesHome()),
               _buildMenuItem(context, Icons.show_chart, "Placement Stats",PlacementStatsPage()),
               _buildMenuItem(context, Icons.event, "Clubs and Events"),
               _buildMenuItem(
                   context, Icons.help_outline, "Lost And Found", LostAndFoundPage()),
-              _buildMenuItem(context, Icons.person_add, "Attendance Tracker"),
+              _buildMenuItem(context, Icons.person_add, "Attendance Tracker",AttendanceTrackerPage()),
             ],
           ),
         ),

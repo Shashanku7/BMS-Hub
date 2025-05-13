@@ -4,8 +4,9 @@ import 'settings.dart'; // Import settings screen
 import 'welcome.dart'; // Import the WelcomePage
 import 'register.dart'; // Import the RegisterPage
 import 'login.dart'; // Import the LoginPage
-
+import 'package:timezone/data/latest.dart' as tz;
 void main() {
+  tz.initializeTimeZones();
   runApp(const MyApp());
 }
 

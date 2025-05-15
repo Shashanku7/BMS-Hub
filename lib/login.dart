@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'homepage.dart'; // Import the HomePage
-import 'reset_code.dart'; // Import the ResetCodePage
+import 'package:google_sign_in/google_sign_in.dart';
+import 'homepage.dart';
+import 'reset_code.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -10,7 +11,7 @@ class LoginPage extends StatefulWidget {
 }
 
 class _LoginPageState extends State<LoginPage> {
-  bool _isPasswordVisible = false; // State for password visibility
+  bool _isPasswordVisible = false;
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
@@ -37,6 +38,36 @@ class _LoginPageState extends State<LoginPage> {
     }
   }
 
+  Future<void> _handleGoogleSignIn() async {
+    final GoogleSignIn _googleSignIn = GoogleSignIn(
+      scopes: ['email'],
+      hostedDomain: 'bmsce.ac.in', // only allow @bmsce.ac.in accounts
+    );
+    try {
+      final account = await _googleSignIn.signIn();
+      if (account == null) return; // User cancelled
+      if (!account.email.endsWith('@bmsce.ac.in')) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Only @bmsce.ac.in email is allowed!')),
+        );
+        await _googleSignIn.signOut();
+        return;
+      }
+      // Google Sign-In Success
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Google Sign-In Successful')),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const HomePage()),
+      );
+    } catch (error) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Google Sign-In failed: $error')),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -47,14 +78,13 @@ class _LoginPageState extends State<LoginPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context); // Navigate back to the Welcome Page
+            Navigator.pop(context);
           },
         ),
       ),
       body: GestureDetector(
-        behavior: HitTestBehavior.opaque, // Ensures taps outside are detected
+        behavior: HitTestBehavior.opaque,
         onTap: () {
-          // Close the keyboard when the user taps outside
           FocusScope.of(context).unfocus();
         },
         child: SingleChildScrollView(
@@ -140,7 +170,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         onPressed: () {
                           setState(() {
-                            _isPasswordVisible = !_isPasswordVisible; // Toggle password visibility
+                            _isPasswordVisible = !_isPasswordVisible;
                           });
                         },
                       ),
@@ -158,7 +188,7 @@ class _LoginPageState extends State<LoginPage> {
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _login, // Call the login method
+                      onPressed: _login,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         shape: RoundedRectangleBorder(
@@ -176,17 +206,40 @@ class _LoginPageState extends State<LoginPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
+                  // Google Sign-In Button
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton.icon(
+                      icon: Image.asset(
+                        'images/google_logo.jpg', // Place a Google logo PNG in your assets
+                        height: 24,
+                        width: 24,
+                      ),
+                      label: const Text(
+                        'Sign up with Google',
+                        style: TextStyle(color: Colors.white, fontSize: 16),
+                      ),
+                      style: OutlinedButton.styleFrom(
+                        side: const BorderSide(color: Colors.white24),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(30)),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: Colors.white12,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: _handleGoogleSignIn,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
                   // Forgot Password
                   GestureDetector(
                     onTap: () {
-                      // Navigate to Reset Code Page
                       Navigator.push(
                         context,
                         PageRouteBuilder(
                           pageBuilder: (context, animation, secondaryAnimation) =>
                           const ResetCodePage(),
                           transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                            const begin = Offset(1.0, 0.0); // Slide in from the right
+                            const begin = Offset(1.0, 0.0);
                             const end = Offset.zero;
                             const curve = Curves.easeInOut;
 
@@ -198,7 +251,7 @@ class _LoginPageState extends State<LoginPage> {
                               child: child,
                             );
                           },
-                          transitionDuration: const Duration(milliseconds: 500), // Smooth transition
+                          transitionDuration: const Duration(milliseconds: 500),
                         ),
                       );
                     },
@@ -216,7 +269,7 @@ class _LoginPageState extends State<LoginPage> {
                   // Register Now
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, '/register'); // Navigate to Register Page
+                      Navigator.pushNamed(context, '/register');
                     },
                     child: const Text(
                       "Don't have an account?\nREGISTER NOW",

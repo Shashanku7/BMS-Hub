@@ -171,24 +171,7 @@ class _PlacementStatsPageState extends State<PlacementStatsPage> {
                 ),
               ),
               const SizedBox(height: 30),
-              // Download Button
-              ElevatedButton(
-                onPressed: () {
-                  // TODO: Add download functionality
-                },
-                style: ElevatedButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(
-                      horizontal: 30.0, vertical: 15.0),
-                  backgroundColor: Colors.blue,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                child: const Text(
-                  "Download Report",
-                  style: TextStyle(fontSize: 16, color: Colors.white),
-                ),
-              ),
+              // The Download Button has been removed!
             ],
           ),
         ),
@@ -204,7 +187,7 @@ class _PlacementStatsPageState extends State<PlacementStatsPage> {
         barRods: [
           BarChartRodData(
             toY: data['2022']!['students'].toDouble(),
-            width: 20, // Increased bar width
+            width: 20,
             color: Colors.blue,
           ),
         ],
@@ -214,7 +197,7 @@ class _PlacementStatsPageState extends State<PlacementStatsPage> {
         barRods: [
           BarChartRodData(
             toY: data['2023']!['students'].toDouble(),
-            width: 20, // Increased bar width
+            width: 20,
             color: Colors.blue,
           ),
         ],
@@ -224,7 +207,7 @@ class _PlacementStatsPageState extends State<PlacementStatsPage> {
         barRods: [
           BarChartRodData(
             toY: data['2024']!['students'].toDouble(),
-            width: 20, // Increased bar width
+            width: 20,
             color: Colors.blue,
           ),
         ],

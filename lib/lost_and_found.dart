@@ -1,4 +1,7 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:file_selector/file_selector.dart'; // Add this package in pubspec.yaml
 
 class LostAndFoundPage extends StatefulWidget {
   const LostAndFoundPage({super.key});
@@ -16,6 +19,7 @@ class _LostAndFoundPageState extends State<LostAndFoundPage> {
       'image': 'images/wallet.jpg',
       'contact': {'name': 'John Doe', 'phone': '123-456-7890', 'email': 'johndoe@example.com'},
       'type': 'lost',
+      'isAsset': true,
     },
     {
       'title': 'Vehicle Key',
@@ -24,6 +28,7 @@ class _LostAndFoundPageState extends State<LostAndFoundPage> {
       'image': 'images/key.webp',
       'contact': {'name': 'Jane Smith', 'phone': '987-654-3210', 'email': 'janesmith@example.com'},
       'type': 'lost',
+      'isAsset': true,
     },
     {
       'title': 'Headphones',
@@ -32,6 +37,7 @@ class _LostAndFoundPageState extends State<LostAndFoundPage> {
       'image': 'images/headphones.webp',
       'contact': {'name': 'Bob Lee', 'phone': '555-123-4567', 'email': 'boblee@example.com'},
       'type': 'lost',
+      'isAsset': true,
     },
   ];
 
@@ -141,7 +147,7 @@ class _LostAndFoundPageState extends State<LostAndFoundPage> {
                             children: [
                               ElevatedButton.icon(
                                 onPressed: () {
-                                  _viewImage(context, item['image']);
+                                  _viewImage(context, item['image'], item['isAsset'] ?? false);
                                 },
                                 icon: Icon(Icons.image),
                                 label: Text('View Image'),
@@ -178,12 +184,18 @@ class _LostAndFoundPageState extends State<LostAndFoundPage> {
     );
   }
 
-  void _viewImage(BuildContext context, String imagePath) {
+  void _viewImage(BuildContext context, String imagePath, bool isAsset) {
     showDialog(
       context: context,
       builder: (context) {
         return AlertDialog(
-          content: Image.asset(imagePath),
+          content: isAsset
+              ? Image.asset(imagePath)
+              : Image.file(
+            // ignore: prefer_relative_imports
+            File(imagePath),
+            errorBuilder: (ctx, error, stack) => Text("Image not found"),
+          ),
         );
       },
     );
@@ -214,63 +226,132 @@ class _LostAndFoundPageState extends State<LostAndFoundPage> {
     final contactNameController = TextEditingController();
     final contactPhoneController = TextEditingController();
     final contactEmailController = TextEditingController();
+    String type = 'lost';
+    String? selectedImagePath;
+    bool isAsset = false;
+
+    setState(() {}); // To trigger rebuild if needed
 
     showDialog(
       context: context,
       builder: (context) {
-        return AlertDialog(
-          title: Text('Add Item'),
-          content: SingleChildScrollView(
-            child: Column(
-              children: [
-                TextField(
-                  controller: titleController,
-                  decoration: InputDecoration(labelText: 'Title'),
-                ),
-                TextField(
-                  controller: descriptionController,
-                  decoration: InputDecoration(labelText: 'Description'),
-                ),
-                TextField(
-                  controller: contactNameController,
-                  decoration: InputDecoration(labelText: 'Contact Name'),
-                ),
-                TextField(
-                  controller: contactPhoneController,
-                  decoration: InputDecoration(labelText: 'Contact Phone'),
-                ),
-                TextField(
-                  controller: contactEmailController,
-                  decoration: InputDecoration(labelText: 'Contact Email'),
-                ),
-              ],
+        return StatefulBuilder(builder: (context, setStateDialog) {
+          return AlertDialog(
+            title: Text('Add Item'),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  DropdownButtonFormField<String>(
+                    value: type,
+                    items: [
+                      DropdownMenuItem(value: 'lost', child: Text('Lost')),
+                      DropdownMenuItem(value: 'found', child: Text('Found')),
+                    ],
+                    onChanged: (val) {
+                      setStateDialog(() {
+                        type = val ?? 'lost';
+                      });
+                    },
+                    decoration: InputDecoration(labelText: 'Category'),
+                  ),
+                  TextField(
+                    controller: titleController,
+                    decoration: InputDecoration(labelText: 'Title'),
+                  ),
+                  TextField(
+                    controller: descriptionController,
+                    decoration: InputDecoration(labelText: 'Description'),
+                  ),
+                  TextField(
+                    controller: contactNameController,
+                    decoration: InputDecoration(labelText: 'Contact Name'),
+                  ),
+                  TextField(
+                    controller: contactPhoneController,
+                    decoration: InputDecoration(labelText: 'Contact Phone'),
+                  ),
+                  TextField(
+                    controller: contactEmailController,
+                    decoration: InputDecoration(labelText: 'Contact Email'),
+                  ),
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      ElevatedButton.icon(
+                        onPressed: () async {
+                          final typeGroup = XTypeGroup(
+                            label: 'images',
+                            extensions: ['jpg', 'jpeg', 'png', 'webp'],
+                          );
+                          final picked = await openFile(acceptedTypeGroups: [typeGroup]);
+                          if (picked != null) {
+                            setStateDialog(() {
+                              selectedImagePath = picked.path;
+                              isAsset = false;
+                            });
+                          }
+                        },
+                        icon: Icon(Icons.image),
+                        label: Text('Upload Image'),
+                      ),
+                      SizedBox(width: 8),
+                      selectedImagePath != null
+                          ? Flexible(
+                        child: Text(
+                          selectedImagePath!.split('/').last,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(fontSize: 12),
+                        ),
+                      )
+                          : SizedBox(),
+                    ],
+                  ),
+                ],
+              ),
             ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-              child: Text('Cancel'),
-            ),
-            ElevatedButton(
-              onPressed: () {
-                if (titleController.text.isEmpty ||
-                    descriptionController.text.isEmpty ||
-                    contactNameController.text.isEmpty ||
-                    contactPhoneController.text.isEmpty ||
-                    contactEmailController.text.isEmpty) {
-                  _showWarningDialog(context, 'All fields are mandatory!');
-                  return;
-                }
+            actions: [
+              TextButton(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: Text('Cancel'),
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  if (titleController.text.isEmpty ||
+                      descriptionController.text.isEmpty ||
+                      contactNameController.text.isEmpty ||
+                      contactPhoneController.text.isEmpty ||
+                      contactEmailController.text.isEmpty ||
+                      selectedImagePath == null) {
+                    _showWarningDialog(context, 'All fields and an image are mandatory!');
+                    return;
+                  }
 
-                Navigator.of(context).pop();
-                _showConfirmationDialog(context, 'Lost/Found request sent successfully!');
-              },
-              child: Text('Submit'),
-            ),
-          ],
-        );
+                  setState(() {
+                    items.add({
+                      'title': titleController.text,
+                      'description': descriptionController.text,
+                      'date': DateTime.now(),
+                      'image': selectedImagePath,
+                      'contact': {
+                        'name': contactNameController.text,
+                        'phone': contactPhoneController.text,
+                        'email': contactEmailController.text,
+                      },
+                      'type': type,
+                      'isAsset': isAsset,
+                    });
+                  });
+
+                  Navigator.of(context).pop();
+                  _showConfirmationDialog(context, 'Lost/Found request sent successfully!');
+                },
+                child: Text('Submit'),
+              ),
+            ],
+          );
+        });
       },
     );
   }

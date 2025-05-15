@@ -2,16 +2,17 @@ import 'dart:io';
 
 import 'package:bms_hub/clubs_and_events.dart';
 import 'package:flutter/material.dart';
-import 'settings.dart'; // Import the settings.dart page
+import 'package:webview_flutter/webview_flutter.dart';
+import 'settings.dart';
 import 'website.dart';
 import 'feedback.dart';
 import 'lost_and_found.dart';
 import 'placement_stats.dart';
 import 'attendance.dart';
 import 'resources.dart';
-import 'clubs_and_events.dart';
 import 'edit_profile.dart';
 import 'app_info.dart';
+
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -25,7 +26,7 @@ class _HomePageState extends State<HomePage> {
   final List<Widget> _pages = [
     const HomeScreen(),
     const AnnouncementsScreen(),
-    const PlaceholderWidget("Campus Map"),
+    const VirtualTourPage(), // <-- Updated for campus map
     const ProfileScreen(),
   ];
 
@@ -37,7 +38,7 @@ class _HomePageState extends State<HomePage> {
           builder: (context) => const AppSettingsScreen(),
         ),
       );
-    }else if (option == "Campus Website") {
+    } else if (option == "Campus Website") {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -192,12 +193,11 @@ class HomeScreen extends StatelessWidget {
             crossAxisSpacing: 20.0,
             mainAxisSpacing: 20.0,
             children: [
-              _buildMenuItem(context, Icons.menu_book, "Study Resources",StudyResourcesHome()),
-              _buildMenuItem(context, Icons.show_chart, "Placement Stats",PlacementStatsPage()),
+              _buildMenuItem(context, Icons.menu_book, "Study Resources", StudyResourcesHome()),
+              _buildMenuItem(context, Icons.show_chart, "Placement Stats", PlacementStatsPage()),
               _buildMenuItem(context, Icons.event, "Clubs and Events", ClubsAndEventsPage()),
-              _buildMenuItem(
-                  context, Icons.help_outline, "Lost And Found", LostAndFoundPage()),
-              _buildMenuItem(context, Icons.person_add, "Attendance Tracker",AttendanceTrackerPage()),
+              _buildMenuItem(context, Icons.help_outline, "Lost And Found", LostAndFoundPage()),
+              _buildMenuItem(context, Icons.person_add, "Attendance Tracker", AttendanceTrackerPage()),
             ],
           ),
         ),
@@ -205,8 +205,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildMenuItem(BuildContext context, IconData icon, String label,
-      [Widget? destination]) {
+  Widget _buildMenuItem(BuildContext context, IconData icon, String label, [Widget? destination]) {
     return GestureDetector(
       onTap: () {
         if (destination != null) {
@@ -234,6 +233,7 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
+
 class AnnouncementsScreen extends StatelessWidget {
   const AnnouncementsScreen({super.key});
 
@@ -540,6 +540,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 }
+
 class PlaceholderWidget extends StatelessWidget {
   final String text;
   const PlaceholderWidget(this.text, {super.key});
@@ -550,6 +551,55 @@ class PlaceholderWidget extends StatelessWidget {
       child: Text(
         text,
         style: const TextStyle(color: Colors.white, fontSize: 24),
+      ),
+    );
+  }
+}
+
+// --- VIRTUAL TOUR PAGE USING WEBVIEWWIDGET (webview_flutter 4.x+) ---
+class VirtualTourPage extends StatefulWidget {
+  const VirtualTourPage({super.key});
+
+  @override
+  State<VirtualTourPage> createState() => _VirtualTourPageState();
+}
+
+class _VirtualTourPageState extends State<VirtualTourPage> {
+  late final WebViewController _controller;
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = WebViewController()
+      ..setJavaScriptMode(JavaScriptMode.unrestricted)
+      ..loadRequest(
+        Uri.parse('https://www.easytourz.com/BT-EmabedTour/all/4f169a745c0555c0'),
+      )
+      ..setNavigationDelegate(
+        NavigationDelegate(
+          onPageFinished: (url) {
+            setState(() {
+              isLoading = false;
+            });
+          },
+        ),
+      );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Campus Virtual Tour'),
+        backgroundColor: Colors.black,
+      ),
+      body: Stack(
+        children: [
+          WebViewWidget(controller: _controller),
+          if (isLoading)
+            const Center(child: CircularProgressIndicator()),
+        ],
       ),
     );
   }

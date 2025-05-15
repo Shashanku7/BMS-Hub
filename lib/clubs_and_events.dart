@@ -63,6 +63,7 @@ class ClubsSection extends StatelessWidget {
       'A vibrant community of music enthusiasts. NINAAD hosts regular jam sessions, musical nights, and vocal training workshops. It is known for its passionate members and soulful performances.',
       'longDescription':
       'NINAAD is the heart of musical expression at BMSCE. Whether you love singing, playing instruments, or just enjoying melodies, NINAAD has something for everyone. Join us for workshops, open mics, and musical festivals where talent finds its voice and friendships are made for life.',
+      'instagram': 'https://www.instagram.com/ninaad.bmsce/',
     },
     {
       'name': 'Samskrutika Sambrama',
@@ -71,6 +72,7 @@ class ClubsSection extends StatelessWidget {
       'A club dedicated to celebrating the cultural diversity of India. It organizes dance competitions, traditional art workshops, and cultural fests to promote heritage and unity.',
       'longDescription':
       'Immerse yourself in India\'s rich tapestry with Samskrutika Sambrama. We bring together all forms of art, culture, and tradition through dance, drama, and folk events. Experience the unity in diversity that makes our campus vibrant and inclusive.',
+      'instagram': 'https://www.instagram.com/samskruthi_sambhrama_bmsce/',
     },
     {
       'name': 'CODEIO',
@@ -79,6 +81,7 @@ class ClubsSection extends StatelessWidget {
       'A hub for coding enthusiasts. CODEIO hosts hackathons, coding marathons, and regular coding challenges to sharpen programming skills. It\'s the go-to place for tech enthusiasts.',
       'longDescription':
       'CODEIO is the sanctuary for coders and technophiles. From beginner workshops to national-level hackathons, we make sure every member finds their tech tribe. Learn, collaborate, and innovate as you journey from student to software pro.',
+      'instagram': 'https://www.instagram.com/codeio_bmsce/',
     },
     {
       'name': 'PENTAGRAM',
@@ -87,6 +90,7 @@ class ClubsSection extends StatelessWidget {
       'A mathematics and problem-solving club that challenges logical thinking and problem-solving abilities. PENTAGRAM regularly conducts quizzes, puzzle contests, and math olympiads.',
       'longDescription':
       'PENTAGRAM is where logic and numbers meet fun! Solve challenging puzzles, compete in math olympiads, and join a community that celebrates the beauty of mathematics. Every event is a step closer to sharper reasoning and analytical skills.',
+      'instagram': 'https://www.instagram.com/bmsce_pentagram/',
     },
     {
       'name': 'IEEE BMSCE',
@@ -95,6 +99,7 @@ class ClubsSection extends StatelessWidget {
       'A professional technical club that aims to foster innovation and technological growth. It holds seminars, workshops, and projects related to electronics and engineering.',
       'longDescription':
       'IEEE BMSCE is committed to technical excellence and innovation. Participate in industry seminars, technical fests, and collaborative projects that open doors to global opportunities. Join us to connect, learn, and grow as a future engineer.',
+      'instagram': 'https://www.instagram.com/bmsce_ieee/',
     },
     {
       'name': 'Mountaineering Club',
@@ -103,6 +108,7 @@ class ClubsSection extends StatelessWidget {
       'For adventure seekers and nature lovers. This club organizes trekking, rock climbing, and camping trips to explore the wild and push physical limits.',
       'longDescription':
       'Discover the thrill of the outdoors with the Mountaineering Club. Whether it\'s trekking, rock climbing, or camping, our adventures foster resilience, environmental awareness, and lifelong friendships. Let\'s conquer new heights together!',
+      'instagram': 'https://www.instagram.com/bmsce.mc/',
     },
     {
       'name': 'ACM BMSCE',
@@ -111,6 +117,7 @@ class ClubsSection extends StatelessWidget {
       'An international society dedicated to computer science and research. It hosts talks, coding competitions, and networking events for aspiring software engineers.',
       'longDescription':
       'ACM BMSCE is your gateway to the world of computer science research and professional networking. We host expert talks, project expos, and competitions that hone your skills and connect you with the tech industry.',
+      'instagram': 'https://www.instagram.com/bmsce_acm/',
     },
     {
       'name': 'Fine Arts Club',
@@ -119,11 +126,11 @@ class ClubsSection extends StatelessWidget {
       'A creative community for artists. The Fine Arts Club encourages painting, sketching, sculpture, and digital art through regular exhibitions and workshops.',
       'longDescription':
       'Unleash your creativity with the Fine Arts Club! Whether you love painting, sketching, or sculpture, this is the place for artistic exploration and expression. Join us for workshops, exhibitions, and collaborations with fellow artists.',
+      'instagram': 'https://www.instagram.com/bmsce_fac/',
     },
   ];
 
-  void _launchInstagram() async {
-    const url = 'https://www.instagram.com/';
+  Future<void> _launchInstagram(String url) async {
     if (await canLaunch(url)) {
       await launch(url);
     }
@@ -157,19 +164,25 @@ class ClubsSection extends StatelessWidget {
                       style: const TextStyle(fontSize: 16),
                     ),
                     const SizedBox(height: 12),
-                    Row(
-                      children: [
-                        IconButton(
-                          icon: const FaIcon(
-                            FontAwesomeIcons.instagram,
-                            color: Colors.purple,
+                    GestureDetector(
+                      onTap: () => _launchInstagram(club['instagram']),
+                      child: Row(
+                        children: [
+                          IconButton(
+                            icon: const FaIcon(
+                              FontAwesomeIcons.instagram,
+                              color: Colors.purple,
+                            ),
+                            onPressed: () => _launchInstagram(club['instagram']),
+                            tooltip: 'Instagram',
                           ),
-                          onPressed: _launchInstagram,
-                          tooltip: 'Instagram',
-                        ),
-                        const SizedBox(width: 8),
-                        const Text('Visit Instagram', style: TextStyle(fontSize: 16)),
-                      ],
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Visit Instagram',
+                            style: TextStyle(fontSize: 16),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -231,6 +244,7 @@ class ClubCard extends StatelessWidget {
   }
 }
 
+// (No changes to EventsSection and EventCard)
 class EventsSection extends StatelessWidget {
   const EventsSection({Key? key}) : super(key: key);
 

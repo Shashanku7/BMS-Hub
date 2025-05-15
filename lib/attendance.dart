@@ -7,7 +7,7 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 // --- Subject Model ---
 class Subject {
-  final String name;
+  String name; // MADE MUTABLE for editing
   int present;
   int total;
   List<String> days;
@@ -208,7 +208,7 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      // Header OUTSIDE padding, stretches full width
+                      // Header
                       Stack(
                         alignment: Alignment.center,
                         children: [
@@ -216,7 +216,8 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                             width: double.infinity,
                             height: 70,
                             decoration: const BoxDecoration(
-                              borderRadius: BorderRadius.vertical(top: Radius.circular(18)),
+                              borderRadius:
+                              BorderRadius.vertical(top: Radius.circular(18)),
                               gradient: LinearGradient(
                                 colors: [Color(0xFF6DB3F2), Color(0xFF1E69DE)],
                                 begin: Alignment.topLeft,
@@ -227,7 +228,8 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                           Positioned(
                             left: 0,
                             child: IconButton(
-                              icon: const Icon(Icons.arrow_back, color: Colors.white, size: 28),
+                              icon: const Icon(Icons.arrow_back,
+                                  color: Colors.white, size: 28),
                               onPressed: () => Navigator.pop(context),
                             ),
                           ),
@@ -241,7 +243,9 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                                   fontSize: 24,
                                   fontWeight: FontWeight.bold,
                                   shadows: [
-                                    Shadow(color: Colors.black.withOpacity(0.2), blurRadius: 4)
+                                    Shadow(
+                                        color: Colors.black.withOpacity(0.2),
+                                        blurRadius: 4)
                                   ],
                                 ),
                               ),
@@ -261,17 +265,22 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                               // Subject Name
                               Container(
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xFF399BE7), width: 1.3),
+                                  border: Border.all(
+                                      color: Color(0xFF399BE7), width: 1.3),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 child: TextFormField(
-                                  style: const TextStyle(color: Colors.white, fontSize: 18),
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 18),
                                   decoration: const InputDecoration(
                                     border: InputBorder.none,
-                                    prefixIcon: Icon(Icons.title, color: Colors.white60, size: 26),
+                                    prefixIcon: Icon(Icons.title,
+                                        color: Colors.white60, size: 26),
                                     hintText: "Subject Name",
-                                    hintStyle: TextStyle(color: Colors.white60, fontSize: 18),
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                                    hintStyle: TextStyle(
+                                        color: Colors.white60, fontSize: 18),
+                                    contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 18),
                                   ),
                                   validator: (value) {
                                     if (value == null || value.trim().isEmpty) {
@@ -286,20 +295,24 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                               ),
                               const SizedBox(height: 4),
                               const Padding(
-                                padding: EdgeInsets.only(left: 2.0, top: 2, bottom: 4),
+                                padding:
+                                EdgeInsets.only(left: 2.0, top: 2, bottom: 4),
                                 child: Align(
                                   alignment: Alignment.centerLeft,
                                   child: Text(
                                     "Better to keep a short name",
-                                    style: TextStyle(color: Colors.white54, fontSize: 14),
+                                    style: TextStyle(
+                                        color: Colors.white54, fontSize: 14),
                                   ),
                                 ),
                               ),
                               // Class Days
                               Container(
-                                margin: const EdgeInsets.symmetric(vertical: 10),
+                                margin:
+                                const EdgeInsets.symmetric(vertical: 10),
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xFF399BE7), width: 1.3),
+                                  border: Border.all(
+                                      color: Color(0xFF399BE7), width: 1.3),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 padding: const EdgeInsets.all(12),
@@ -308,7 +321,10 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                                   children: [
                                     const Text(
                                       "Class Days",
-                                      style: TextStyle(color: Colors.white, fontSize: 17, fontWeight: FontWeight.w500),
+                                      style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 17,
+                                          fontWeight: FontWeight.w500),
                                     ),
                                     const SizedBox(height: 10),
                                     Wrap(
@@ -316,24 +332,39 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                                       runSpacing: 8.0,
                                       children: [
                                         for (final day in [
-                                          "Monday", "Tuesday", "Wednesday",
-                                          "Thursday", "Friday", "Saturday", "Sunday"
+                                          "Monday",
+                                          "Tuesday",
+                                          "Wednesday",
+                                          "Thursday",
+                                          "Friday",
+                                          "Saturday",
+                                          "Sunday"
                                         ])
                                           ChoiceChip(
-                                            label: Text(day, style: TextStyle(
-                                              color: selectedDays.contains(day) ? Colors.white : Colors.white70,
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.w500,
-                                            )),
+                                            label: Text(day,
+                                                style: TextStyle(
+                                                  color: selectedDays
+                                                      .contains(day)
+                                                      ? Colors.white
+                                                      : Colors.white70,
+                                                  fontSize: 15,
+                                                  fontWeight: FontWeight.w500,
+                                                )),
                                             selected: selectedDays.contains(day),
                                             selectedColor: Colors.blue[700],
-                                            backgroundColor: const Color(0xFF22262B),
-                                            side: BorderSide(color: Colors.blue[400]!),
+                                            backgroundColor:
+                                            const Color(0xFF22262B),
+                                            side: BorderSide(
+                                                color: Colors.blue[400]!),
                                             onSelected: (isSelected) {
                                               setDialogState(() {
-                                                if (isSelected && !selectedDays.contains(day)) {
+                                                if (isSelected &&
+                                                    !selectedDays
+                                                        .contains(day)) {
                                                   selectedDays.add(day);
-                                                } else if (!isSelected && selectedDays.contains(day)) {
+                                                } else if (!isSelected &&
+                                                    selectedDays
+                                                        .contains(day)) {
                                                   selectedDays.remove(day);
                                                 }
                                               });
@@ -344,7 +375,8 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                                     const SizedBox(height: 7),
                                     const Text(
                                       "You can edit class days anytime",
-                                      style: TextStyle(color: Colors.white54, fontSize: 13),
+                                      style: TextStyle(
+                                          color: Colors.white54, fontSize: 13),
                                     ),
                                   ],
                                 ),
@@ -352,23 +384,30 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                               // Already Present
                               Container(
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xFF399BE7), width: 1.3),
+                                  border: Border.all(
+                                      color: Color(0xFF399BE7), width: 1.3),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 margin: const EdgeInsets.only(top: 10),
                                 child: TextFormField(
-                                  style: const TextStyle(color: Colors.white, fontSize: 17),
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 17),
                                   keyboardType: TextInputType.number,
                                   decoration: const InputDecoration(
                                     border: InputBorder.none,
-                                    prefixIcon: Icon(Icons.check_circle_outline, color: Colors.white54),
+                                    prefixIcon: Icon(Icons.check_circle_outline,
+                                        color: Colors.white54),
                                     hintText: "Already Present",
-                                    hintStyle: TextStyle(color: Colors.white60, fontSize: 16),
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                                    hintStyle: TextStyle(
+                                        color: Colors.white60, fontSize: 16),
+                                    contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 18),
                                   ),
                                   validator: (value) {
-                                    if (value == null || value.isEmpty) return "Enter number of classes present";
-                                    if (int.tryParse(value) == null) return "Enter a valid number";
+                                    if (value == null || value.isEmpty)
+                                      return "Enter number of classes present";
+                                    if (int.tryParse(value) == null)
+                                      return "Enter a valid number";
                                     return null;
                                   },
                                   onSaved: (value) {
@@ -379,23 +418,30 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                               // Already Absent
                               Container(
                                 decoration: BoxDecoration(
-                                  border: Border.all(color: Color(0xFF399BE7), width: 1.3),
+                                  border: Border.all(
+                                      color: Color(0xFF399BE7), width: 1.3),
                                   borderRadius: BorderRadius.circular(10),
                                 ),
                                 margin: const EdgeInsets.only(top: 14),
                                 child: TextFormField(
-                                  style: const TextStyle(color: Colors.white, fontSize: 17),
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 17),
                                   keyboardType: TextInputType.number,
                                   decoration: const InputDecoration(
                                     border: InputBorder.none,
-                                    prefixIcon: Icon(Icons.cancel_outlined, color: Colors.white54),
+                                    prefixIcon: Icon(Icons.cancel_outlined,
+                                        color: Colors.white54),
                                     hintText: "Already Absent",
-                                    hintStyle: TextStyle(color: Colors.white60, fontSize: 16),
-                                    contentPadding: EdgeInsets.symmetric(horizontal: 16, vertical: 18),
+                                    hintStyle: TextStyle(
+                                        color: Colors.white60, fontSize: 16),
+                                    contentPadding: EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 18),
                                   ),
                                   validator: (value) {
-                                    if (value == null || value.isEmpty) return "Enter number of classes absent";
-                                    if (int.tryParse(value) == null) return "Enter a valid number";
+                                    if (value == null || value.isEmpty)
+                                      return "Enter number of classes absent";
+                                    if (int.tryParse(value) == null)
+                                      return "Enter a valid number";
                                     return null;
                                   },
                                   onSaved: (value) {
@@ -410,17 +456,22 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                                     backgroundColor: Colors.transparent,
                                     foregroundColor: Colors.blue[200],
                                     elevation: 0,
-                                    padding: const EdgeInsets.symmetric(horizontal: 48, vertical: 10),
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 48, vertical: 10),
                                     shape: RoundedRectangleBorder(
                                       borderRadius: BorderRadius.circular(32),
-                                      side: BorderSide(color: Colors.blue[400]!, width: 1.5),
+                                      side: BorderSide(
+                                          color: Colors.blue[400]!, width: 1.5),
                                     ),
                                   ),
                                   onPressed: () {
                                     if (formKey.currentState!.validate()) {
                                       if (selectedDays.isEmpty) {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text("Please select at least one class day")),
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content: Text(
+                                                  "Please select at least one class day")),
                                         );
                                         return;
                                       }
@@ -440,7 +491,9 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                                   },
                                   child: const Text(
                                     "Submit",
-                                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+                                    style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.w500),
                                   ),
                                 ),
                               ),
@@ -496,7 +549,7 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                     ),
-                    icon: const Icon(Icons.add),
+                    icon: const Icon(Icons.add,color: Colors.white),
                     label: const Text("Add Subject", style: TextStyle(fontSize: 18)),
                     onPressed: () {
                       Navigator.pop(context);
@@ -511,7 +564,7 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                     ),
-                    icon: const Icon(Icons.schedule),
+                    icon: const Icon(Icons.schedule,color: Colors.white),
                     label: const Text("View Schedule", style: TextStyle(fontSize: 18)),
                     onPressed: () {
                       Navigator.pop(context);
@@ -529,11 +582,35 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                       padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                     ),
-                    icon: const Icon(Icons.alarm),
+                    icon: const Icon(Icons.alarm,color: Colors.white),
                     label: const Text("Set Reminder", style: TextStyle(fontSize: 18)),
                     onPressed: () async {
                       Navigator.pop(context);
                       await _showSetReminderDialog();
+                    },
+                  ),
+                  const SizedBox(height: 18),
+                  // --- EDIT SCHEDULE BUTTON HERE ---
+                  ElevatedButton.icon(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.teal[700],
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 26, vertical: 14),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                    ),
+                    icon: const Icon(Icons.edit,color: Colors.white),
+                    label: const Text("Edit Schedule", style: TextStyle(fontSize: 18)),
+                    onPressed: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => EditSchedulePage(
+                            subjects: subjects,
+                            onUpdate: () => setState(() {}),
+                          ),
+                        ),
+                      );
                     },
                   ),
                   if (_reminderTime != null)
@@ -570,7 +647,7 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                       },
                     ),
                   )),
-                  const SizedBox(height: 24), // For bottom safe area/gap
+                  const SizedBox(height: 24),
                 ],
               ),
             ),
@@ -632,10 +709,11 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
               ),
               onPressed: (selectedTime != null)
                   ? () async {
-                Navigator.pop(context); // Close the dialog immediately!
+                Navigator.pop(context);
                 _reminderTime = selectedTime;
                 await NotificationService().cancelAll();
-                await NotificationService().scheduleDailyNotification(selectedTime!);
+                await NotificationService()
+                    .scheduleDailyNotification(selectedTime!);
                 if (!mounted) return;
                 setState(() {});
                 ScaffoldMessenger.of(context).showSnackBar(
@@ -655,7 +733,6 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
       ),
     );
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -694,7 +771,7 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                 icon: const Icon(Icons.add),
                 label: const Text("Add a Class"),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue,
+                  backgroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
                   ),
@@ -729,7 +806,9 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                   itemBuilder: (context, index) {
                     final subject = todaySubjects[index];
                     final statuses = subject.attendanceHistory[todayStr] ??
-                        (subject.days.contains(getCurrentDay()) ? ["No Class"] : []);
+                        (subject.days.contains(getCurrentDay())
+                            ? ["No Class"]
+                            : []);
                     return GestureDetector(
                       onTap: () => openSubjectCalendar(subject),
                       child: Card(
@@ -752,12 +831,15 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                               ...List.generate(statuses.length, (classIdx) {
                                 String classStatus = statuses[classIdx];
                                 return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 4),
+                                  padding:
+                                  const EdgeInsets.symmetric(vertical: 4),
                                   child: Row(
                                     children: [
                                       Text(
                                         "Class ${classIdx + 1}: ",
-                                        style: const TextStyle(color: Colors.white70, fontSize: 16),
+                                        style: const TextStyle(
+                                            color: Colors.white70,
+                                            fontSize: 16),
                                       ),
                                       _statusButton(
                                         subject,
@@ -788,7 +870,8 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
                               }),
                               const SizedBox(height: 8),
                               Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                mainAxisAlignment:
+                                MainAxisAlignment.spaceBetween,
                                 children: [
                                   Text(
                                     "Attendance: ${subject.present}/${subject.total}",
@@ -874,14 +957,19 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
               padding: EdgeInsets.all(16),
               child: Text(
                 "Add Class For Subject",
-                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+                style: TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18),
                 textAlign: TextAlign.center,
               ),
             ),
             ...subjects.map((subj) => ListTile(
-              title: Text(subj.name, style: const TextStyle(color: Colors.white)),
+              title: Text(subj.name,
+                  style: const TextStyle(color: Colors.white)),
               onTap: () {
-                String dateStr = DateFormat('yyyy-MM-dd').format(getBangaloreNow());
+                String dateStr =
+                DateFormat('yyyy-MM-dd').format(getBangaloreNow());
                 setState(() {
                   subj.addExtraClass(dateStr);
                 });
@@ -902,33 +990,200 @@ class _AttendanceTrackerPageState extends State<AttendanceTrackerPage> {
       String currentStatus,
       ) {
     bool selected = status == currentStatus;
-    Color color;
-    if (status == "Present") color = Colors.green;
-    else if (status == "Absent") color = Colors.red;
-    else color = Colors.orange;
+    Color selectedColor;
+    if (status == "Present") selectedColor = Colors.green;
+    else if (status == "Absent") selectedColor = Colors.red;
+    else selectedColor = Colors.orange;
 
     return Expanded(
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: selected ? color : Colors.grey[800],
-          foregroundColor: Colors.white,
-          minimumSize: const Size(0, 36),
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 2),
-        ),
-        onPressed: () {
-          setState(() {
-            subject.setStatusForDate(dateStr, classIndex, status);
-          });
-        },
-        child: Text(
-          status,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 3.0),
+        child: TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: selected ? selectedColor : Colors.grey[800],
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(22),
+            ),
+            minimumSize: const Size(0, 42),
+            textStyle: TextStyle(
+              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+              fontSize: 15,
+            ),
           ),
+          onPressed: () {
+            setState(() {
+              subject.setStatusForDate(dateStr, classIndex, status);
+            });
+          },
+          child: Text(status),
         ),
       ),
+    );
+  }
+}
+
+// --- Edit Schedule Page ---
+class EditSchedulePage extends StatefulWidget {
+  final List<Subject> subjects;
+  final VoidCallback onUpdate;
+  const EditSchedulePage({super.key, required this.subjects, required this.onUpdate});
+
+  @override
+  State<EditSchedulePage> createState() => _EditSchedulePageState();
+}
+
+class _EditSchedulePageState extends State<EditSchedulePage> {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: const Text("Edit Schedule"), backgroundColor: Colors.black),
+      backgroundColor: Colors.black,
+      body: ListView.builder(
+        itemCount: widget.subjects.length,
+        itemBuilder: (context, index) {
+          final subj = widget.subjects[index];
+          return Card(
+            color: Colors.grey[900],
+            margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 12),
+            child: ListTile(
+              title: Text(subj.name, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+              subtitle: Text(
+                "Days: ${subj.days.join(', ')}",
+                style: const TextStyle(color: Colors.white70),
+              ),
+              trailing: IconButton(
+                icon: const Icon(Icons.delete, color: Colors.redAccent),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (_) => AlertDialog(
+                      backgroundColor: Colors.black,
+                      title: const Text("Delete Subject", style: TextStyle(color: Colors.white)),
+                      content: const Text("Are you sure you want to delete this subject?", style: TextStyle(color: Colors.white70)),
+                      actions: [
+                        TextButton(
+                          child: const Text("Cancel"),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        TextButton(
+                          child: const Text("Delete", style: TextStyle(color: Colors.redAccent)),
+                          onPressed: () {
+                            setState(() {
+                              widget.subjects.removeAt(index);
+                            });
+                            widget.onUpdate();
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    ),
+                  );
+                },
+              ),
+              onTap: () async {
+                await showDialog(
+                  context: context,
+                  builder: (ctx) => EditSubjectDialog(
+                    subject: subj,
+                    onSave: () => setState(() {}),
+                  ),
+                );
+                widget.onUpdate();
+              },
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+// --- Edit Subject Dialog ---
+class EditSubjectDialog extends StatefulWidget {
+  final Subject subject;
+  final VoidCallback onSave;
+  const EditSubjectDialog({super.key, required this.subject, required this.onSave});
+
+  @override
+  State<EditSubjectDialog> createState() => _EditSubjectDialogState();
+}
+
+class _EditSubjectDialogState extends State<EditSubjectDialog> {
+  late TextEditingController nameController;
+  late List<String> selectedDays;
+
+  @override
+  void initState() {
+    super.initState();
+    nameController = TextEditingController(text: widget.subject.name);
+    selectedDays = List<String>.from(widget.subject.days);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return AlertDialog(
+      backgroundColor: const Color(0xFF181C20),
+      title: const Text("Edit Subject", style: TextStyle(color: Colors.white)),
+      content: SingleChildScrollView(
+        child: Column(
+          children: [
+            TextField(
+              controller: nameController,
+              style: const TextStyle(color: Colors.white),
+              decoration: const InputDecoration(
+                labelText: "Subject Name",
+                labelStyle: TextStyle(color: Colors.white60),
+                border: OutlineInputBorder(),
+              ),
+            ),
+            const SizedBox(height: 12),
+            const Align(
+              alignment: Alignment.centerLeft,
+              child: Text("Class Days", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+            ),
+            Wrap(
+              spacing: 8.0,
+              children: [
+                for (final day in [
+                  "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"
+                ])
+                  ChoiceChip(
+                    label: Text(day, style: TextStyle(
+                      color: selectedDays.contains(day) ? Colors.white : Colors.white70,
+                    )),
+                    selected: selectedDays.contains(day),
+                    selectedColor: Colors.blue[700],
+                    backgroundColor: const Color(0xFF22262B),
+                    onSelected: (isSelected) {
+                      setState(() {
+                        if (isSelected && !selectedDays.contains(day)) selectedDays.add(day);
+                        else if (!isSelected && selectedDays.contains(day)) selectedDays.remove(day);
+                      });
+                    },
+                  ),
+              ],
+            ),
+          ],
+        ),
+      ),
+      actions: [
+        TextButton(
+          onPressed: () => Navigator.pop(context),
+          child: const Text("Cancel"),
+        ),
+        ElevatedButton(
+          onPressed: () {
+            widget.subject.name = nameController.text.trim();
+            widget.subject.days
+              ..clear()
+              ..addAll(selectedDays);
+            widget.onSave();
+            Navigator.pop(context);
+          },
+          child: const Text("Save"),
+        ),
+      ],
     );
   }
 }
@@ -1012,7 +1267,6 @@ class _SubjectCalendarPageState extends State<SubjectCalendarPage> {
                         "Class ${i + 1}:",
                         style: const TextStyle(color: Colors.white, fontSize: 15),
                       ),
-                      const SizedBox(width: 12),
                       _statusButton(subject, dateStr, i, "Present", status),
                       const SizedBox(width: 8),
                       _statusButton(subject, dateStr, i, "Absent", status),
@@ -1064,31 +1318,33 @@ class _SubjectCalendarPageState extends State<SubjectCalendarPage> {
       String currentStatus,
       ) {
     bool selected = status == currentStatus;
-    Color color;
-    if (status == "Present") color = Colors.green;
-    else if (status == "Absent") color = Colors.red;
-    else color = Colors.orange;
+    Color selectedColor;
+    if (status == "Present") selectedColor = Colors.green;
+    else if (status == "Absent") selectedColor = Colors.red;
+    else selectedColor = Colors.orange;
 
     return Expanded(
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: selected ? color : Colors.grey[800],
-          foregroundColor: Colors.white,
-          minimumSize: const Size(0, 36),
-          elevation: 0,
-          padding: const EdgeInsets.symmetric(horizontal: 2),
-        ),
-        onPressed: () {
-          setState(() {
-            subject.setStatusForDate(dateStr, classIndex, status);
-          });
-        },
-        child: Text(
-          status,
-          style: TextStyle(
-            fontSize: 14,
-            fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 3.0),
+        child: TextButton(
+          style: TextButton.styleFrom(
+            backgroundColor: selected ? selectedColor : Colors.grey[800],
+            foregroundColor: Colors.white,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(22),
+            ),
+            minimumSize: const Size(0, 42),
+            textStyle: TextStyle(
+              fontWeight: selected ? FontWeight.bold : FontWeight.normal,
+              fontSize: 15,
+            ),
           ),
+          onPressed: () {
+            setState(() {
+              subject.setStatusForDate(dateStr, classIndex, status);
+            });
+          },
+          child: Text(status),
         ),
       ),
     );

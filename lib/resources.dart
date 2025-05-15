@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:file_picker/file_picker.dart';
+import 'package:file_selector/file_selector.dart';
+import 'package:open_file/open_file.dart';
 
 class FileInfo {
   final String name;
@@ -46,6 +47,8 @@ class StudyResourcesApp extends StatelessWidget {
 }
 
 class MainNavigationScreen extends StatefulWidget {
+  const MainNavigationScreen({super.key});
+
   @override
   State<MainNavigationScreen> createState() => _MainNavigationScreenState();
 }
@@ -134,6 +137,8 @@ class DummyPage extends StatelessWidget {
 enum ViewScreen { browser, upload, subdirectory, files }
 
 class StudyResourcesHome extends StatefulWidget {
+  const StudyResourcesHome({super.key});
+
   @override
   State<StudyResourcesHome> createState() => _StudyResourcesHomeState();
 }
@@ -143,7 +148,7 @@ class _StudyResourcesHomeState extends State<StudyResourcesHome> {
   String selectedSem = semesters[3];
 
   String? uploadDept, uploadSem, uploadSubject, uploadType;
-  PlatformFile? selectedFile;
+  XFile? selectedFile; // Use XFile from file_selector
   String? uploadResultPath;
   String? currentSubject, currentSubdirectory;
   ViewScreen screen = ViewScreen.browser;
@@ -236,14 +241,11 @@ class _StudyResourcesHomeState extends State<StudyResourcesHome> {
                 style: TextStyle(color: Colors.white)),
             onTap: () async {
               Navigator.pop(ctx);
-              final result = await FilePicker.platform.pickFiles(
-                allowMultiple: false,
-                withReadStream: true,
-                type: FileType.any,
-              );
-              if (result != null && result.files.isNotEmpty) {
+              final typeGroup = XTypeGroup(label: 'files', extensions: []); // allow any file
+              final file = await openFile(acceptedTypeGroups: [typeGroup]);
+              if (file != null) {
                 setState(() {
-                  selectedFile = result.files.first;
+                  selectedFile = file;
                 });
               }
             },
@@ -265,8 +267,13 @@ class _StudyResourcesHomeState extends State<StudyResourcesHome> {
       );
       return;
     }
-    // Actually add file to the in-memory database
-    filesDb.addFile(uploadDept!, uploadSem!, uploadSubject!, uploadType!, FileInfo(selectedFile!.name, selectedFile!.path));
+    filesDb.addFile(
+        uploadDept!,
+        uploadSem!,
+        uploadSubject!,
+        uploadType!,
+        FileInfo(selectedFile!.name, selectedFile!.path)
+    );
     final path =
         '${uploadDept!.toLowerCase()}/sem${uploadSem!.toLowerCase()}/${uploadSubject!.toLowerCase().replaceAll(' ', '_')}/${uploadType!.toLowerCase()}/${selectedFile!.name}';
     setState(() {
@@ -289,7 +296,6 @@ class _StudyResourcesHomeState extends State<StudyResourcesHome> {
             color: Colors.black,
             child: Row(
               children: [
-                // Back button for explore page (main resource browser)
                 if (screen == ViewScreen.browser)
                   IconButton(
                     icon: const Icon(Icons.arrow_back, color: Colors.white),
@@ -587,8 +593,23 @@ class _StudyResourcesHomeState extends State<StudyResourcesHome> {
                   title: Text(files[idx].name,
                       style: const TextStyle(
                           color: Colors.white, fontSize: 15)),
-                  onTap: () {
-                    // Optionally open the file from files[idx].path
+                  onTap: () async {
+                    if (files[idx].path != null) {
+                      final result = await OpenFile.open(files[idx].path!);
+                      if (result.type == ResultType.noAppToOpen) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(content: Text("No app found to open this file!")),
+                        );
+                      } else if (result.type != ResultType.done) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text("Error opening file: ${result.message}")),
+                        );
+                      }
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text("File path not available!")),
+                      );
+                    }
                   },
                 ),
               );

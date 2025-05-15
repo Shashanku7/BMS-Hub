@@ -1,3 +1,6 @@
+import 'dart:io';
+
+import 'package:bms_hub/clubs_and_events.dart';
 import 'package:flutter/material.dart';
 import 'settings.dart'; // Import the settings.dart page
 import 'website.dart';
@@ -6,6 +9,9 @@ import 'lost_and_found.dart';
 import 'placement_stats.dart';
 import 'attendance.dart';
 import 'resources.dart';
+import 'clubs_and_events.dart';
+import 'edit_profile.dart';
+import 'app_info.dart';
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
 
@@ -98,7 +104,14 @@ class _HomePageState extends State<HomePage> {
             ListTile(
               leading: const Icon(Icons.info, color: Colors.white),
               title: const Text("About Us", style: TextStyle(color: Colors.white)),
-              onTap: () => _onMenuOptionSelected(context, "About Us"),
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AppInfoPage(),
+                  ),
+                );
+              },
             ),
           ],
         ),
@@ -181,7 +194,7 @@ class HomeScreen extends StatelessWidget {
             children: [
               _buildMenuItem(context, Icons.menu_book, "Study Resources",StudyResourcesHome()),
               _buildMenuItem(context, Icons.show_chart, "Placement Stats",PlacementStatsPage()),
-              _buildMenuItem(context, Icons.event, "Clubs and Events"),
+              _buildMenuItem(context, Icons.event, "Clubs and Events", ClubsAndEventsPage()),
               _buildMenuItem(
                   context, Icons.help_outline, "Lost And Found", LostAndFoundPage()),
               _buildMenuItem(context, Icons.person_add, "Attendance Tracker",AttendanceTrackerPage()),
@@ -366,11 +379,30 @@ class AnnouncementsScreen extends StatelessWidget {
   }
 }
 
-class ProfileScreen extends StatelessWidget {
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
 
   @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  String username = "Shashank U";
+  String email = "shashanku.cs23@bmsce.ac.in";
+  String phoneNumber = "9876543210";
+  String bio = "";
+  String profilePicUrl = "";
+  File? imageFile;
+
+  @override
   Widget build(BuildContext context) {
+    ImageProvider? profileImage;
+    if (imageFile != null) {
+      profileImage = FileImage(imageFile!);
+    } else if (profilePicUrl.isNotEmpty) {
+      profileImage = NetworkImage(profilePicUrl);
+    }
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -389,23 +421,26 @@ class ProfileScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 20),
-        const CircleAvatar(
+        CircleAvatar(
           radius: 40,
           backgroundColor: Colors.blue,
-          child: Icon(Icons.person, color: Colors.white, size: 40),
+          backgroundImage: profileImage,
+          child: profileImage == null
+              ? const Icon(Icons.person, color: Colors.white, size: 40)
+              : null,
         ),
         const SizedBox(height: 10),
-        const Text(
-          "Shashank U",
-          style: TextStyle(
+        Text(
+          username,
+          style: const TextStyle(
             color: Colors.white,
             fontSize: 20,
             fontWeight: FontWeight.bold,
           ),
         ),
-        const Text(
-          "shashanku.cs23@bmsce.ac.in",
-          style: TextStyle(
+        Text(
+          email,
+          style: const TextStyle(
               color: Colors.white70,
               fontSize: 14),
         ),
@@ -414,10 +449,29 @@ class ProfileScreen extends StatelessWidget {
           child: ListView(
             padding: const EdgeInsets.symmetric(horizontal: 20),
             children: [
-              _buildActionButton(Icons.edit, "Edit Profile", () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("Edit Profile Selected")),
+              _buildActionButton(Icons.edit, "Edit Profile", () async {
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditProfilePage(
+                      currentUsername: username,
+                      email: email,
+                      phoneNumber: phoneNumber,
+                      bio: bio,
+                      profilePicUrl: profilePicUrl,
+                    ),
+                  ),
                 );
+                // If result is not null, update the state
+                if (result != null && mounted) {
+                  setState(() {
+                    username = result['username'] ?? username;
+                    phoneNumber = result['phone'] ?? phoneNumber;
+                    bio = result['bio'] ?? bio;
+                    imageFile = result['imageFile'] ?? imageFile;
+                    profilePicUrl = result['profilePicUrl'] ?? profilePicUrl;
+                  });
+                }
               }),
               const SizedBox(height: 25),
               _buildActionButton(Icons.settings, "App Settings", () {
@@ -445,8 +499,11 @@ class ProfileScreen extends StatelessWidget {
               }),
               const SizedBox(height: 25),
               _buildActionButton(Icons.info, "App info", () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(content: Text("App Info Selected")),
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const AppInfoPage(),
+                  ),
                 );
               }),
             ],

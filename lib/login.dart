@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'homepage.dart';
 import 'reset_code.dart';
 
@@ -23,37 +24,69 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _login() {
+  // Email/Password Login with Firebase Auth
+  Future<void> _login() async {
     if (_formKey.currentState!.validate()) {
-      // Show a success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login Successful')),
-      );
-
-      // Navigate to HomePage
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
-      );
+      // Restrict email to @bmsce.ac.in
+      if (!_emailController.text.trim().endsWith('@bmsce.ac.in')) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Only @bmsce.ac.in email is allowed!')),
+        );
+        return;
+      }
+      try {
+        await FirebaseAuth.instance.signInWithEmailAndPassword(
+          email: _emailController.text.trim(),
+          password: _passwordController.text,
+        );
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Login Successful')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const HomePage()),
+        );
+      } on FirebaseAuthException catch (e) {
+        String message = 'Login failed';
+        if (e.code == 'user-not-found') {
+          message = 'No user found for that email.';
+        } else if (e.code == 'wrong-password') {
+          message = 'Wrong password provided.';
+        }
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(message)),
+        );
+      }
     }
   }
 
+  // Google Sign-In with Firebase Auth, always show account picker
   Future<void> _handleGoogleSignIn() async {
     final GoogleSignIn _googleSignIn = GoogleSignIn(
       scopes: ['email'],
-      hostedDomain: 'bmsce.ac.in', // only allow @bmsce.ac.in accounts
+      hostedDomain: 'bmsce.ac.in',
     );
     try {
-      final account = await _googleSignIn.signIn();
-      if (account == null) return; // User cancelled
-      if (!account.email.endsWith('@bmsce.ac.in')) {
+      // Always sign out first to force account picker to show
+      await _googleSignIn.signOut();
+
+      final googleUser = await _googleSignIn.signIn();
+      if (googleUser == null) return; // User cancelled
+      if (!googleUser.email.endsWith('@bmsce.ac.in')) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Only @bmsce.ac.in email is allowed!')),
         );
         await _googleSignIn.signOut();
         return;
       }
-      // Google Sign-In Success
+      final googleAuth = await googleUser.authentication;
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth.accessToken,
+        idToken: googleAuth.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Google Sign-In Successful')),
       );
@@ -97,12 +130,11 @@ class _LoginPageState extends State<LoginPage> {
                 children: [
                   // Illustration Image
                   Image.asset(
-                    'images/login_illustration.png', // Replace with your image path
+                    'images/login_illustration.png',
                     height: 250,
                     fit: BoxFit.contain,
                   ),
                   const SizedBox(height: 20),
-                  // Title
                   const Text(
                     "WELCOME BACK",
                     style: TextStyle(
@@ -211,7 +243,7 @@ class _LoginPageState extends State<LoginPage> {
                     width: double.infinity,
                     child: OutlinedButton.icon(
                       icon: Image.asset(
-                        'images/google_logo.jpg', // Place a Google logo PNG in your assets
+                        'images/google_logo.jpg',
                         height: 24,
                         width: 24,
                       ),

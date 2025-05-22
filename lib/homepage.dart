@@ -555,8 +555,6 @@ class PlaceholderWidget extends StatelessWidget {
     );
   }
 }
-
-// --- VIRTUAL TOUR PAGE USING WEBVIEWWIDGET (webview_flutter 4.x+) ---
 class VirtualTourPage extends StatefulWidget {
   const VirtualTourPage({super.key});
 

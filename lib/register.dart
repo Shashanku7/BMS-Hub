@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'homepage.dart'; // Import the HomePage widget
+import 'package:firebase_auth/firebase_auth.dart';
+import 'verify_email_page.dart';
 
 class RegisterPage extends StatefulWidget {
   const RegisterPage({super.key});
@@ -9,30 +10,59 @@ class RegisterPage extends StatefulWidget {
 }
 
 class _RegisterPageState extends State<RegisterPage> {
-  final _formKey = GlobalKey<FormState>(); // Key for form validation
+  final _formKey = GlobalKey<FormState>();
+  final TextEditingController _usernameController = TextEditingController();
+  final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _repeatPasswordController = TextEditingController();
-  bool _isPasswordVisible = false; // State for password visibility
-  bool _isRepeatPasswordVisible = false; // State for repeat password visibility
+  bool _isPasswordVisible = false;
+  bool _isRepeatPasswordVisible = false;
+  bool _registering = false;
 
   @override
   void dispose() {
+    _usernameController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
     _repeatPasswordController.dispose();
     super.dispose();
   }
 
-  void _register() {
-    if (_formKey.currentState!.validate()) {
-      // Show a success message
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Registration Successful')),
-      );
+  Future<void> _registerAndGoToVerify() async {
+    if (!_formKey.currentState!.validate()) return;
 
-      // Navigate to HomePage
+    setState(() => _registering = true);
+
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final username = _usernameController.text.trim();
+
+    try {
+      // Register user
+      final cred = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        email: email,
+        password: password,
+      );
+      // Send verification
+      await cred.user!.sendEmailVerification();
+      // Sign out to ensure clean session
+      await FirebaseAuth.instance.signOut();
+
+      if (!mounted) return;
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomePage()),
+        MaterialPageRoute(
+          builder: (_) => VerifyEmailPage(
+            email: email,
+            password: password,
+            username: username,
+          ),
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() => _registering = false);
+      ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message ?? 'Registration failed'))
       );
     }
   }
@@ -47,29 +77,27 @@ class _RegisterPageState extends State<RegisterPage> {
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.white),
           onPressed: () {
-            Navigator.pop(context); // Go back to the previous screen
+            Navigator.pop(context);
           },
         ),
       ),
       body: GestureDetector(
         behavior: HitTestBehavior.opaque,
-        onTap: () => FocusScope.of(context).unfocus(), // Dismiss keyboard on tap
+        onTap: () => FocusScope.of(context).unfocus(),
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.symmetric(horizontal: 20.0),
             child: Form(
-              key: _formKey, // Associate the form with the key
+              key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  // Illustration Image
                   Image.asset(
-                    'images/register_illustration.png', // Replace with your image path
+                    'images/register_illustration.png',
                     height: 250,
                     fit: BoxFit.contain,
                   ),
                   const SizedBox(height: 20),
-                  // Title
                   const Text(
                     "LET'S GET STARTED",
                     style: TextStyle(
@@ -90,8 +118,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 30),
-                  // Username Field
                   TextFormField(
+                    controller: _usernameController,
                     decoration: InputDecoration(
                       hintText: 'Username',
                       prefixIcon: const Icon(Icons.person, color: Colors.white54),
@@ -112,8 +140,8 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                   ),
                   const SizedBox(height: 15),
-                  // Email Field
                   TextFormField(
+                    controller: _emailController,
                     keyboardType: TextInputType.emailAddress,
                     decoration: InputDecoration(
                       hintText: '@bmsce.ac.in email',
@@ -138,10 +166,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                   ),
                   const SizedBox(height: 15),
-                  // Password Field
                   TextFormField(
                     controller: _passwordController,
-                    obscureText: !_isPasswordVisible, // Toggle visibility
+                    obscureText: !_isPasswordVisible,
                     decoration: InputDecoration(
                       hintText: 'Password',
                       prefixIcon: const Icon(Icons.lock_outline, color: Colors.white54),
@@ -161,7 +188,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         onPressed: () {
                           setState(() {
-                            _isPasswordVisible = !_isPasswordVisible; // Toggle state
+                            _isPasswordVisible = !_isPasswordVisible;
                           });
                         },
                       ),
@@ -178,10 +205,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                   ),
                   const SizedBox(height: 15),
-                  // Repeat Password Field
                   TextFormField(
                     controller: _repeatPasswordController,
-                    obscureText: !_isRepeatPasswordVisible, // Toggle visibility
+                    obscureText: !_isRepeatPasswordVisible,
                     decoration: InputDecoration(
                       hintText: 'Repeat Password',
                       prefixIcon: const Icon(Icons.lock_outline, color: Colors.white54),
@@ -201,7 +227,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         onPressed: () {
                           setState(() {
-                            _isRepeatPasswordVisible = !_isRepeatPasswordVisible; // Toggle state
+                            _isRepeatPasswordVisible = !_isRepeatPasswordVisible;
                           });
                         },
                       ),
@@ -218,11 +244,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     },
                   ),
                   const SizedBox(height: 30),
-                  // Register Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _register, // Call the register method
+                      onPressed: _registering ? null : _registerAndGoToVerify,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.blue,
                         shape: RoundedRectangleBorder(
@@ -230,7 +255,13 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                         padding: const EdgeInsets.symmetric(vertical: 15),
                       ),
-                      child: const Text(
+                      child: _registering
+                          ? const SizedBox(
+                        height: 20,
+                        width: 20,
+                        child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2),
+                      )
+                          : const Text(
                         'REGISTER',
                         style: TextStyle(
                           fontSize: 18,
@@ -240,10 +271,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     ),
                   ),
                   const SizedBox(height: 20),
-                  // Already have an account? Login
                   GestureDetector(
                     onTap: () {
-                      Navigator.pushNamed(context, '/login'); // Navigate to login page
+                      Navigator.pushNamed(context, '/login');
                     },
                     child: const Text(
                       'Already have an account?\nLOGIN',

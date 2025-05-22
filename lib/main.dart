@@ -1,17 +1,27 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
-import 'settings.dart'; // Import settings screen
-import 'welcome.dart'; // Import the WelcomePage
-import 'register.dart'; // Import the RegisterPage
-import 'login.dart'; // Import the LoginPage
+import 'settings.dart';
+import 'welcome.dart';
+import 'register.dart';
+import 'login.dart';
+import 'homepage.dart';
 import 'package:timezone/data/latest.dart' as tz;
-void main() {
+
+// Firebase dependencies
+import 'package:firebase_core/firebase_core.dart';
+import 'firebase_options.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized(); // Required for async in main
   tz.initializeTimeZones();
+  // Initialize Firebase
+  await Firebase.initializeApp(
+    options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  // Initialize the global theme notifier
   static final ValueNotifier<ThemeMode> themeNotifier = ValueNotifier(ThemeMode.light);
 
   const MyApp({super.key});
@@ -26,14 +36,43 @@ class MyApp extends StatelessWidget {
           theme: ThemeData.light(),
           darkTheme: ThemeData.dark(),
           themeMode: currentTheme,
-          initialRoute: '/', // Define the initial route
+          initialRoute: '/',
           routes: {
-            '/': (context) => SplashScreen(logoAssetPath: 'images/logo.png'), // SplashScreen is now the initial route
-            '/welcome': (context) => const WelcomePage(), // Add WelcomePage route
-            '/register': (context) => const RegisterPage(), // Add RegisterPage route
-            '/login': (context) => const LoginPage(), // Add LoginPage route
-            '/settings': (context) => const AppSettingsScreen(), // Add AppSettingsScreen route
+            '/': (context) => const FirebaseGate(), // <-- Show FirebaseGate first
+            '/welcome': (context) => const WelcomePage(),
+            '/register': (context) => const RegisterPage(),
+            '/login': (context) => const LoginPage(),
+            '/settings': (context) => const AppSettingsScreen(),
+            '/home': (context) => HomePage(),
           },
+        );
+      },
+    );
+  }
+}
+
+/// A widget that shows a loading indicator while Firebase initializes, then shows the real SplashScreen.
+class FirebaseGate extends StatelessWidget {
+  const FirebaseGate({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return FutureBuilder(
+      future: Firebase.initializeApp(
+        options: DefaultFirebaseOptions.currentPlatform,
+      ),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          return SplashScreen(logoAssetPath: 'images/logo.png');
+        }
+        // Show loading indicator while waiting for Firebase
+        return const Scaffold(
+          backgroundColor: Colors.black,
+          body: Center(
+            child: CircularProgressIndicator(
+              valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            ),
+          ),
         );
       },
     );
@@ -59,7 +98,6 @@ class _SplashScreenState extends State<SplashScreen> {
   void initState() {
     super.initState();
 
-    // Animate loading dots
     _dotTimer = Timer.periodic(const Duration(milliseconds: 600), (timer) {
       if (mounted) {
         setState(() {
@@ -68,7 +106,6 @@ class _SplashScreenState extends State<SplashScreen> {
       }
     });
 
-    // Slower progress bar
     _progressTimer = Timer.periodic(const Duration(milliseconds: 80), (timer) {
       if (mounted) {
         setState(() {
@@ -77,7 +114,6 @@ class _SplashScreenState extends State<SplashScreen> {
             _progressValue = 1.0;
             _progressTimer.cancel();
 
-            // Navigate to WelcomePage after progress completes
             Future.delayed(const Duration(milliseconds: 300), () {
               if (mounted) {
                 Navigator.pushReplacement(
@@ -85,13 +121,9 @@ class _SplashScreenState extends State<SplashScreen> {
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) => const WelcomePage(),
                     transitionsBuilder: (context, animation, secondaryAnimation, child) {
-                      // Apply a fade (dissolve) transition
-                      return FadeTransition(
-                        opacity: animation,
-                        child: child,
-                      );
+                      return FadeTransition(opacity: animation, child: child);
                     },
-                    transitionDuration: const Duration(milliseconds: 400), // Smooth transition duration
+                    transitionDuration: const Duration(milliseconds: 400),
                   ),
                 );
               }
@@ -122,16 +154,13 @@ class _SplashScreenState extends State<SplashScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Display the logo with height
               Image.asset('images/logo.png', height: 350, width: 850),
               const SizedBox(height: 40),
-              // Display the loading text
               Text(
                 loadingText,
                 style: const TextStyle(color: Colors.white70, fontSize: 21),
               ),
               const SizedBox(height: 20),
-              // Display the progress bar
               ClipRRect(
                 borderRadius: BorderRadius.circular(10),
                 child: LinearProgressIndicator(
@@ -141,7 +170,7 @@ class _SplashScreenState extends State<SplashScreen> {
                   minHeight: 8,
                 ),
               ),
-              const SizedBox(height: 40), // Space below the progress bar
+              const SizedBox(height: 40),
             ],
           ),
         ),
